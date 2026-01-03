@@ -27,7 +27,7 @@
 
     <div class="bg-gray-900 text-white py-2 px-4 text-center text-[10px] md:text-sm font-bold uppercase tracking-wide flex justify-center items-center gap-3">
         🎁 <span class="text-orange-400">DOUBLE REWARD:</span> Friends get 25% OFF. You get <span class="text-green-400">1 WEEK FREE!</span>
-        <a href="https://wa.me/?text=Hey!%20Check%20out%20The%20South%20Indian%20Table.%20Delicious%20home-cooked%20meals!" target="_blank" class="bg-green-600 px-3 py-1 rounded-full text-[9px] hover:bg-green-700">Invite Friends</a>
+        <button onclick="shareViaWhatsApp()" class="bg-green-600 px-3 py-1 rounded-full text-[9px] hover:bg-green-700">Invite Friends</button>
     </div>
 
     <nav class="bg-white py-4 shadow-md sticky top-0 z-50">
@@ -97,7 +97,7 @@
                     </div>
                     <form id="finalSubForm" class="space-y-4">
                         <input type="hidden" name="planDuration" id="hiddenPlan"><input type="hidden" name="preference" id="hiddenPref"><input type="hidden" name="mealType" id="hiddenMeal"><input type="hidden" name="service" id="hiddenService"><input type="hidden" name="logic" id="hiddenLogic"><input type="hidden" name="finalPrice" id="hiddenPrice">
-                        <input type="text" name="name" placeholder="Full Name" required class="w-full p-4 border rounded-xl outline-none">
+                        <input type="text" name="name" id="userName" placeholder="Full Name" required class="w-full p-4 border rounded-xl outline-none">
                         <input type="tel" name="mobile" placeholder="Mobile" required class="w-full p-4 border rounded-xl outline-none">
                         <input type="email" name="email" placeholder="Email" required class="w-full p-4 border rounded-xl outline-none">
                         
@@ -118,7 +118,10 @@
                 <h3 class="text-3xl font-bold mb-2 text-orange-600">You're All Set!</h3>
                 <p class="text-gray-600 mb-4 font-medium">Welcome to The South Indian Table family.</p>
                 <p class="text-sm text-gray-500 mb-8">We've sent a confirmation email with your order details and your unique referral code. Get ready for some authentic flavors!</p>
-                <button onclick="location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition">Awesome, let's go!</button>
+                
+                <button id="successWaBtn" onclick="shareViaWhatsApp()" class="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold mb-4 hover:opacity-90 transition">Invite Friends via WhatsApp</button>
+                
+                <button onclick="location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition">Return to Home</button>
             </div>
         </div>
     </div>
@@ -132,6 +135,13 @@
         let subData = { planDuration: '', preference: '', mealType: '', service: '', logic: 'N/A' }, allowedPostcodes = [], validReferralCodes = [], currentStepNum = 1;
         const prices = { "5-Day": { "Vegetarian": { "Lunch Only": { "Collection": 30, "Delivery": 35 }, "Dinner Only": { "Collection": 30, "Delivery": 35 }, "Both": { "Collection": 50, "Delivery": { "Together": 55, "Individual": 60 } } }, "Non-Veg": { "Lunch Only": { "Collection": 32, "Delivery": 37 }, "Dinner Only": { "Collection": 32, "Delivery": 37 }, "Both": { "Collection": 54, "Delivery": { "Together": 59, "Individual": 64 } } } }, "7-Day": { "Vegetarian": { "Lunch Only": { "Collection": 42, "Delivery": 49 }, "Dinner Only": { "Collection": 42, "Delivery": 49 }, "Both": { "Collection": 70, "Delivery": { "Together": 77, "Individual": 85 } } }, "Non-Veg": { "Lunch Only": { "Collection": 45, "Delivery": 53 }, "Dinner Only": { "Collection": 45, "Delivery": 53 }, "Both": { "Collection": 75, "Delivery": { "Together": 85, "Individual": 90 } } } } };
         
+        // UPDATED: Now uses ricepot.co.uk
+        function shareViaWhatsApp() {
+            const code = "YOUR_CODE"; 
+            const msg = `Hey I am loving the meals from South Indian Table. Use code ${code} to get a 25% off on your first week and sign up here: https://ricepot.co.uk`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
         function updateDeadline() { const now = new Date(); const d = new Date(); d.setHours(22,0,0,0); if (now > d) document.getElementById('deadlineTimer').innerHTML = "🛑 Orders Closed for Tomorrow"; else document.getElementById('deadlineTimer').innerHTML = `⏱️ Order within <b>${Math.floor((d-now)/3600000)}h ${Math.floor(((d-now)%3600000)/60000)}m</b> for tomorrow.`; }
         function startSubscription(dur) { subData.planDuration = dur; document.getElementById('subModal').classList.add('active'); showStep(1); }
         function closeModal() { document.getElementById('subModal').classList.remove('active'); }
