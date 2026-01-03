@@ -183,6 +183,11 @@
             fetch(webAppUrl).then(r => r.json()).then(res => { 
                 allowedPostcodes = res.allowedPostcodes; 
                 validReferralCodes = res.validReferralCodes;
+                
+                // --- THE UPDATED LINE IS BELOW ---
+                for(let w=1; w<=4; w++) { document.getElementById('w'+w).innerHTML = ''; }
+                // --- END OF UPDATED LINE ---
+
                 const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
                 days.forEach(day => { 
                     if (res.menu[day]) {
@@ -196,5 +201,6 @@
     </script>
 </body>
 </html>
+
 
 
