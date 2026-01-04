@@ -178,21 +178,30 @@
 
         document.getElementById('finalSubForm').addEventListener('submit', function(e) { e.preventDefault(); const btn = document.getElementById('submitBtn'); btn.innerHTML = "Processing..."; btn.disabled = true; fetch(webAppUrl, { method: 'POST', body: new FormData(this) }).then(() => { document.getElementById('modalBody').classList.add('hidden'); document.getElementById('successContent').classList.remove('hidden'); }); });
         
-        window.onload = function() { 
+      window.onload = function() { 
             updateDeadline(); setInterval(updateDeadline, 60000); 
             fetch(webAppUrl).then(r => r.json()).then(res => { 
                 allowedPostcodes = res.allowedPostcodes; 
                 validReferralCodes = res.validReferralCodes;
                 
-                // --- THE UPDATED LINE IS BELOW ---
+                // Clear all 4 containers first
                 for(let w=1; w<=4; w++) { document.getElementById('w'+w).innerHTML = ''; }
-                // --- END OF UPDATED LINE ---
 
                 const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
                 days.forEach(day => { 
                     if (res.menu[day]) {
+                        // Loop 1 to 4 to distribute the daily menu into the correct week tab
                         for(let w=1; w<=4; w++) {
-                            document.getElementById('w'+w).innerHTML += `<div class="bg-white p-5 rounded-2xl border"><p class="text-[10px] text-gray-400 uppercase">${day}</p><p class="text-xs mt-2"><b>L:</b> ${res.menu[day]['w'+w].lunch}</p><p class="text-xs"><b>D:</b> ${res.menu[day]['w'+w].dinner}</p></div>`;
+                            const weekData = res.menu[day]['w'+w];
+                            // ONLY append if there is actual data for that specific week and day
+                            if(weekData) {
+                                document.getElementById('w'+w).innerHTML += `
+                                    <div class="bg-white p-5 rounded-2xl border">
+                                        <p class="text-[10px] text-gray-400 uppercase">${day}</p>
+                                        <p class="text-xs mt-2"><b>L:</b> ${weekData.lunch}</p>
+                                        <p class="text-xs"><b>D:</b> ${weekData.dinner}</p>
+                                    </div>`;
+                            }
                         }
                     }
                 }); 
@@ -201,6 +210,7 @@
     </script>
 </body>
 </html>
+
 
 
 
