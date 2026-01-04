@@ -54,9 +54,11 @@
         </div>
     </section>
 
-    <section id="menu-section" class="py-16 bg-gray-50 text-center">
+  <section id="menu-section" class="py-16 bg-gray-50 text-center">
         <div class="container mx-auto px-4">
-            <h2 class="text-2xl font-bold mb-8 text-gray-800">Weekly Menu Cycle</h2>
+            <h2 class="text-2xl font-bold mb-2 text-gray-800">Weekly Menu Cycle</h2>
+            <p id="currentWeekDisplay" class="text-orange-600 font-semibold mb-8 italic text-sm"></p>
+
             <div class="flex justify-center gap-4 mb-10 overflow-x-auto pb-2">
                 <button class="tab-btn active px-6 py-2 font-bold whitespace-nowrap" onclick="openWeek(event, 'w1')">Week 1</button>
                 <button class="tab-btn px-6 py-2 font-bold whitespace-nowrap" onclick="openWeek(event, 'w2')">Week 2</button>
@@ -190,36 +192,49 @@ window.onload = function() {
                 const diffInMs = today - startDate;
                 const diffInWeeks = Math.floor(diffInMs / (1000 * 60 * 60 * 24 * 7));
                 
-                // Cycle through 1-4 based on the difference
-                // Week 1: Jan 5 | Week 2: Jan 12 | Week 3: Jan 19 | Week 4: Jan 26 | Week 1: Feb 2...
+                // Cycle through 1-4. Note: Today (Jan 4) will show Week 4, Tomorrow (Jan 5) shows Week 1.
                 const currentWeekNum = ((diffInWeeks % 4) + 4) % 4 + 1; 
                 const activeWeekId = 'w' + currentWeekNum;
 
-                // 2. Clear all 4 containers and remove default active classes
+                // 2. Update the heading text
+                const weekDisplay = document.getElementById('currentWeekDisplay');
+                if(weekDisplay) {
+                    weekDisplay.innerText = `Current Active Week: Week ${currentWeekNum}`;
+                }
+
+                // 3. Reset all Tabs (Clear content and remove active classes)
                 for(let w=1; w<=4; w++) { 
-                    document.getElementById('w'+w).innerHTML = ''; 
-                    document.getElementById('w'+w).classList.remove('active');
+                    const container = document.getElementById('w'+w);
+                    if(container) {
+                        container.innerHTML = ''; 
+                        container.classList.remove('active');
+                    }
                 }
                 
-                // 3. Highlight the correct Tab Button
+                // 4. Highlight the correct Tab Button automatically
                 document.querySelectorAll('.tab-btn').forEach(btn => {
                     btn.classList.remove('active');
+                    // This checks the button's onclick attribute to see if it matches our current week
                     if(btn.getAttribute('onclick').includes(activeWeekId)) {
                         btn.classList.add('active');
                     }
                 });
 
-                // 4. Set the calculated week as active
-                document.getElementById(activeWeekId).classList.add('active');
+                // 5. Show the correct Menu Container automatically
+                const activeContainer = document.getElementById(activeWeekId);
+                if(activeContainer) {
+                    activeContainer.classList.add('active');
+                }
 
-                // 5. Fill the menu data
+                // 6. Fill the menu data from Google Sheets
                 const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
                 days.forEach(day => { 
                     if (res.menu[day]) {
                         for(let w=1; w<=4; w++) {
                             const weekData = res.menu[day]['w'+w];
-                            if(weekData) {
-                                document.getElementById('w'+w).innerHTML += `
+                            const targetGrid = document.getElementById('w'+w);
+                            if(weekData && targetGrid) {
+                                targetGrid.innerHTML += `
                                     <div class="bg-white p-5 rounded-2xl border">
                                         <p class="text-[10px] text-gray-400 uppercase">${day}</p>
                                         <p class="text-xs mt-2"><b>L:</b> ${weekData.lunch}</p>
@@ -234,6 +249,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
