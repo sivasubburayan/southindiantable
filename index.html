@@ -178,22 +178,46 @@
 
         document.getElementById('finalSubForm').addEventListener('submit', function(e) { e.preventDefault(); const btn = document.getElementById('submitBtn'); btn.innerHTML = "Processing..."; btn.disabled = true; fetch(webAppUrl, { method: 'POST', body: new FormData(this) }).then(() => { document.getElementById('modalBody').classList.add('hidden'); document.getElementById('successContent').classList.remove('hidden'); }); });
         
-      window.onload = function() { 
+window.onload = function() { 
             updateDeadline(); setInterval(updateDeadline, 60000); 
             fetch(webAppUrl).then(r => r.json()).then(res => { 
                 allowedPostcodes = res.allowedPostcodes; 
                 validReferralCodes = res.validReferralCodes;
                 
-                // Clear all 4 containers first
-                for(let w=1; w<=4; w++) { document.getElementById('w'+w).innerHTML = ''; }
+                // 1. Calculate the current week based on Soft Launch (Jan 5, 2026)
+                const startDate = new Date("2026-01-05");
+                const today = new Date();
+                const diffInMs = today - startDate;
+                const diffInWeeks = Math.floor(diffInMs / (1000 * 60 * 60 * 24 * 7));
+                
+                // Cycle through 1-4 based on the difference
+                // Week 1: Jan 5 | Week 2: Jan 12 | Week 3: Jan 19 | Week 4: Jan 26 | Week 1: Feb 2...
+                const currentWeekNum = ((diffInWeeks % 4) + 4) % 4 + 1; 
+                const activeWeekId = 'w' + currentWeekNum;
 
+                // 2. Clear all 4 containers and remove default active classes
+                for(let w=1; w<=4; w++) { 
+                    document.getElementById('w'+w).innerHTML = ''; 
+                    document.getElementById('w'+w).classList.remove('active');
+                }
+                
+                // 3. Highlight the correct Tab Button
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if(btn.getAttribute('onclick').includes(activeWeekId)) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                // 4. Set the calculated week as active
+                document.getElementById(activeWeekId).classList.add('active');
+
+                // 5. Fill the menu data
                 const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
                 days.forEach(day => { 
                     if (res.menu[day]) {
-                        // Loop 1 to 4 to distribute the daily menu into the correct week tab
                         for(let w=1; w<=4; w++) {
                             const weekData = res.menu[day]['w'+w];
-                            // ONLY append if there is actual data for that specific week and day
                             if(weekData) {
                                 document.getElementById('w'+w).innerHTML += `
                                     <div class="bg-white p-5 rounded-2xl border">
@@ -210,6 +234,7 @@
     </script>
 </body>
 </html>
+
 
 
 
